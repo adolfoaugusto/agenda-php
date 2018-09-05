@@ -29,20 +29,19 @@
                     </thead>
                     <tbody>
                         <?php
-                        $sql = 'SELECT * FROM contatos ORDER BY id DESC';
+                        $sql = 'SELECT * FROM contatos ORDER BY id ASC';
                         
                         foreach($pdo->query($sql)as $row)
                         {
                             echo '<tr>';
-                            echo '<td>'. $row['nome'] . '</td>';
-                            echo '<td>'. $row['telefone'] . '</td>';
-                            echo '<td width=250>';
-                            echo '<a class="btn btn-primary" href="read.php?id='.$row['id'].'">Listar</a>';
-                            echo ' ';
-                            echo '<a class="btn btn-warning" href="update.php?id='.$row['id'].'">Atualizar</a>';
-                            echo ' ';
-                            echo '<a class="btn btn-danger" href="delete.php?id='.$row['id'].'">Excluir</a>';
-                            echo '</td>';
+                                echo '<td>'. $row['nome'] . '</td>';
+                                echo '<td>'. $row['telefone'] . '</td>';
+
+                                echo '<td width=250>';
+                                    echo '<a class="btn btn-primary" href="read.php?id='.$row['id'].'">Listar</a> ';
+                                    echo '<a class="btn btn-warning" href="update.php?id='.$row['id'].'">Atualizar</a> ';
+                                    echo '<a class="btn btn-danger" href="delete.php?id='.$row['id'].'">Excluir</a> ';
+                                echo '</td>';
                             echo '<tr>';
                         }
                         Banco::desconectar();
@@ -50,9 +49,6 @@
                     </tbody>                   
                 </table>               
             </div>
-            <?php
-               get_all_records();
-            ?>
         </div>
         </div>
     </body>

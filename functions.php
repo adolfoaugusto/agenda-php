@@ -1,28 +1,49 @@
 <?php 
+require_once 'Banco.class.php';
 
 if(isset($_POST["Import"])){
     $filename=$_FILES["file"]["tmp_name"];       
- 
-    if($_FILES["file"]["size"] > 0){
-        $file = fopen($filename, "r");
-        while (($getData = fgetcsv($file, 10000, ";")) !== FALSE){
+    // $csv = array_map('str_getcsv', file('data.csv'));
 
-            $sql = "INSERT INTO contatos (nome,telefone) values ('".$getData[0]."','".$getData[1]."')";
-            $result = mysqli_query($conexao, $sql);
-            if(!isset($result)){
-                echo "<script type=\"text/javascript\">
-                        alert(\"Arquivo inválido: Por favor Upload de arquivo CSV.\");
-                        window.location = \"index.php\"
-                </script>";       
-            } else {
-                echo "<script type=\"text/javascript\">
-                    alert(\"arquivo CSV importado.\");
+    if($_FILES["file"]["size"] > 0){
+        $ler = read_csv_to_array($filename);
+        // print_r($ler);
+        foreach ($ler as $item) {
+        
+            $pdo = Banco::conectar();
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "INSERT INTO contatos (nome, telefone) VALUES(?,?)";
+            $q = $pdo->prepare($sql);
+            $q->execute(array($item['nome'],$item['telefone']));
+            
+        }
+        if(!isset($q)){
+            echo "<script type=\"text/javascript\">
+                    alert(\"Arquivo inválido: Por favor Upload de arquivo CSV.\");
                     window.location = \"index.php\"
-                </script>";
-            }
+            </script>";  
+        } else {
+            echo "<script type=\"text/javascript\">
+                alert(\"arquivo CSV importado.\");
+                window.location = \"index.php\"
+            </script>";
         }
         
-        fclose($file); 
+        // fclose($file); 
     }
-}    
- 
+}     
+
+function read_csv_to_array($filename = '', $delimiter = ','){
+    
+    if (!file_exists($filename) || !is_readable($filename)) return false;
+    $header = null;
+    $data = array();
+    if (($handle = fopen($filename, 'r')) !== false) {
+        while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
+            if (!$header) $header = $row;
+            else $data[] = array_combine($header, $row);
+        }
+        fclose($handle);
+    }
+    return $data;
+}
